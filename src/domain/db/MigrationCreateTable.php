@@ -7,6 +7,8 @@ use yii2lab\db\domain\behaviors\migrate\GrandTableFilter;
 use yii2lab\db\domain\behaviors\migrate\NormalizeTableOptionsFilter;
 use yii2lab\db\domain\enums\EventEnum;
 use yii2lab\db\domain\events\TableEvent;
+use yii2lab\db\domain\helpers\MigrationHelper;
+use yii2lab\db\domain\helpers\TableHelper;
 
 abstract class MigrationCreateTable extends BaseMigration {
 	
@@ -35,10 +37,10 @@ abstract class MigrationCreateTable extends BaseMigration {
 	public function down() {
 		$this->myDropTable();
 	}
-	
+
 	protected function myDropTable() {
 		$event = new TableEvent();
-		$event->table = $this->table;
+		$event->table = $this->tableName();
 		
 		$this->trigger(EventEnum::BEFORE_DROP_TABLE, $event);
 		
@@ -57,7 +59,7 @@ abstract class MigrationCreateTable extends BaseMigration {
 	
 	protected function myCreateTable($columns, $options = null) {
 		$event = new TableEvent();
-		$event->table = $this->table;
+		$event->table = $this->tableName();
 		$event->options = $options;
 		
 		$this->trigger(EventEnum::BEFORE_CREATE_TABLE, $event);

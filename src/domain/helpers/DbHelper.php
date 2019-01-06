@@ -57,6 +57,7 @@ class DbHelper {
 		unset($connection['driver']);
 		unset($connection['host']);
 		unset($connection['dbname']);
+        unset($connection['map']);
 		return $connection;
 	}
 	

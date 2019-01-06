@@ -11,6 +11,16 @@ class MigrationHelper {
 		$table = str_replace(['{', '}', '%'], '', $table);
 		return $table;
 	}
+
+    public static function yiiTableName($table) {
+        $table = '{{%' . $table . '}}';
+        return $table;
+    }
+
+    public static function normalizeYiiTableName($table) {
+        $table = self::pureTableName($table);
+        return self::yiiTableName($table);
+    }
 	
 	public static function getTableNameOfClass($className) {
 		$className = basename($className);
