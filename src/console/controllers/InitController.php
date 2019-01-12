@@ -3,6 +3,7 @@
 namespace yii2lab\db\console\controllers;
 
 use yii2lab\extension\console\base\Controller;
+use yii2lab\extension\scenario\collections\ScenarioCollection;
 use yii2lab\extension\scenario\helpers\ScenarioHelper;
 
 class InitController extends Controller
@@ -16,7 +17,8 @@ class InitController extends Controller
 	 */
 	public function actionIndex()
 	{
-		ScenarioHelper::runAll($this->module->actions);
+		$filterCollection = new ScenarioCollection($this->module->actions);
+		$filterCollection->runAll();
 	}
 	
 }
