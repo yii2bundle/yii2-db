@@ -4,6 +4,7 @@ namespace yii2lab\db\domain\filters\init;
 
 use Yii;
 use yii\base\BaseObject;
+use yii2lab\app\domain\helpers\EnvService;
 use yii2lab\designPattern\command\interfaces\CommandInterface;
 
 class SetSequence extends BaseObject implements CommandInterface
@@ -12,7 +13,7 @@ class SetSequence extends BaseObject implements CommandInterface
 	public $tableList;
 	
 	public function run() {
-		$config = env('connection.main');
+		$config = EnvService::get('connection.main');
 		$defaultSchema = $config['defaultSchema'];
 		if($config['driver'] != 'pgsql') {
 			return null;
