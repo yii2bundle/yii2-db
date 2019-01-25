@@ -21,9 +21,9 @@ class TableHelper
 
 	public static function getGlobalName(string $tableName) {
 		self::loadMap();
-        $schema = ArrayHelper::getValue(self::$map, $tableName);
-        if($schema) {
-            $tableName = $schema . DOT . $tableName;
+        $globalName = ArrayHelper::getValue(self::$map, $tableName);
+        if($globalName) {
+            $tableName = $globalName;
         }
 		return $tableName;
 	}
