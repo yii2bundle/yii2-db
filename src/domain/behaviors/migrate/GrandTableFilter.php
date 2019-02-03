@@ -4,7 +4,7 @@ namespace yii2lab\db\domain\behaviors\migrate;
 
 use yii\base\Behavior;
 use yii\helpers\ArrayHelper;
-use yii2lab\app\domain\helpers\EnvService;
+use yii2rails\app\domain\helpers\EnvService;
 use yii2lab\db\domain\enums\EventEnum;
 use yii2lab\db\domain\events\TableEvent;
 use yii2lab\db\domain\helpers\PostgresHelper;

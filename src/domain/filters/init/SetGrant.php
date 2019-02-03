@@ -4,7 +4,7 @@ namespace yii2lab\db\domain\filters\init;
 
 use Yii;
 use yii\base\BaseObject;
-use yii2lab\app\domain\helpers\EnvService;
+use yii2rails\app\domain\helpers\EnvService;
 use yii2lab\designPattern\command\interfaces\CommandInterface;
 
 class SetGrant extends BaseObject implements CommandInterface

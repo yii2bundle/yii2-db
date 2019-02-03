@@ -3,16 +3,16 @@
 namespace yii2lab\db\domain\helpers;
 
 use yii\helpers\ArrayHelper;
-use yii2lab\app\domain\helpers\EnvService;
-use yii2lab\extension\common\helpers\Helper;
-use yii2lab\extension\common\helpers\UrlHelper;
+use yii2rails\app\domain\helpers\EnvService;
+use yii2rails\extension\common\helpers\Helper;
+use yii2rails\extension\common\helpers\UrlHelper;
 use yii2lab\db\domain\enums\DbDriverEnum;
 use Yii;
 use yii\db\Exception;
 use yii\db\Connection;
 use yii2lab\db\domain\helpers\DbHelper;
-use yii2lab\domain\exceptions\UnprocessableEntityHttpException;
-use yii2lab\domain\helpers\ErrorCollection;
+use yii2rails\domain\exceptions\UnprocessableEntityHttpException;
+use yii2rails\domain\helpers\ErrorCollection;
 
 class TableHelper
 {

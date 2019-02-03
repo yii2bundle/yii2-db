@@ -2,9 +2,9 @@
 
 namespace yii2lab\db\console\controllers;
 
-use yii2lab\extension\console\base\Controller;
-use yii2lab\extension\scenario\collections\ScenarioCollection;
-use yii2lab\extension\scenario\helpers\ScenarioHelper;
+use yii2rails\extension\console\base\Controller;
+use yii2rails\extension\scenario\collections\ScenarioCollection;
+use yii2rails\extension\scenario\helpers\ScenarioHelper;
 
 class InitController extends Controller
 {

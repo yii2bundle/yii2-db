@@ -3,12 +3,12 @@
 namespace yii2lab\db\domain\drivers;
 
 use Yii;
-use yii2lab\extension\yii\helpers\FileHelper;
+use yii2rails\extension\yii\helpers\FileHelper;
 use yii\helpers\Inflector;
 use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
 use yii2lab\db\domain\interfaces\DriverInterface;
-use yii2lab\extension\store\Store;
+use yii2rails\extension\store\Store;
 
 class DiskDriver implements DriverInterface
 {

@@ -4,10 +4,10 @@ namespace yii2lab\db\domain\filters\migration;
 
 //use common\enums\app\ApiVersionEnum;
 use Yii;
-use yii2lab\app\domain\enums\AppEnum;
-use yii2lab\extension\scenario\base\BaseScenario;
-use yii2lab\extension\common\helpers\ModuleHelper;
-use yii2lab\extension\yii\helpers\FileHelper;
+use yii2rails\app\domain\enums\AppEnum;
+use yii2rails\extension\scenario\base\BaseScenario;
+use yii2rails\extension\common\helpers\ModuleHelper;
+use yii2rails\extension\yii\helpers\FileHelper;
 use yii2mod\helpers\ArrayHelper;
 
 class SetPath extends BaseScenario {

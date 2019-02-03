@@ -3,7 +3,7 @@
 namespace yii2lab\db\domain\helpers;
 
 use yii\base\Event;
-use yii2lab\app\domain\helpers\EnvService;
+use yii2rails\app\domain\helpers\EnvService;
 use yii2lab\db\domain\enums\DbDriverEnum;
 
 class PostgresHelper {
