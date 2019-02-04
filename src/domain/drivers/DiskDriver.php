@@ -3,6 +3,7 @@
 namespace yii2lab\db\domain\drivers;
 
 use Yii;
+use yii2rails\extension\store\StoreFile;
 use yii2rails\extension\yii\helpers\FileHelper;
 use yii\helpers\Inflector;
 use yii\helpers\ArrayHelper;
@@ -68,8 +69,8 @@ class DiskDriver implements DriverInterface
 	{
 		$rows = $this->indexingDataByPk($table, $rows);
 		$file = $this->getFixtureDataDir() . DS . $table . '.php';
-		$store = new Store('php');
-		$store->save($file, $rows);
+		$store = new StoreFile($file);
+		$store->save($rows);
 	}
 
 	private function buildPkIndex($pkList, $row)
