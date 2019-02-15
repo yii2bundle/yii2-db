@@ -8,12 +8,12 @@ class PgsqlDriver extends BaseDriver
 {
 	
 	public function clearTable($table) {
-		$this->executeSql("TRUNCATE TABLE \"$table\" RESTART IDENTITY CASCADE");
+		$this->executeSql("TRUNCATE TABLE $table RESTART IDENTITY CASCADE");
 	}
 	
 	public function disableForeignKeyChecks($table)
 	{
-		$this->executeSql("ALTER TABLE \"$table\" DISABLE TRIGGER ALL;");
+		$this->executeSql("ALTER TABLE $table DISABLE TRIGGER ALL;");
 	}
 	
 	protected function showTables()

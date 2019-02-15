@@ -3,6 +3,7 @@
 namespace yii2lab\db\domain\drivers;
 
 use Yii;
+use yii2lab\db\domain\helpers\TableHelper;
 use yii2lab\db\domain\interfaces\DbDriverInterface;
 use yii2rails\extension\common\helpers\Helper;
 use yii2lab\db\domain\interfaces\DriverInterface;
@@ -22,10 +23,12 @@ class DbDriver implements DriverInterface
 	}
 	
 	public function disableForeignKeyChecks($table) {
+        $table = TableHelper::getGlobalName($table);
 		return $this->driver->disableForeignKeyChecks($table);
 	}
 	
 	public function truncateData($table) {
+        $table = TableHelper::getGlobalName($table);
 		return $this->driver->clearTable($table);
 	}
 	
@@ -41,11 +44,13 @@ class DbDriver implements DriverInterface
 	
 	public function loadData($table)
 	{
+        $table = TableHelper::getGlobalName($table);
 		return $this->driver->loadData($table);
 	}
 
 	public function saveData($table, $data)
 	{
+        $table = TableHelper::getGlobalName($table);
 		return $this->driver->saveData($table, $data);
 	}
 	
