@@ -31,7 +31,11 @@ class TableHelper
 	private static function loadMap() {
 	    if(self::$map === null) {
             $config = EnvService::getConnection('main');
-            self::$map = ArrayHelper::getValue($config, 'map', []);
+            if($config['driver'] == 'pgsql') {
+                self::$map = ArrayHelper::getValue($config, 'map', []);
+            } else {
+                self::$map = [];
+            }
         }
     }
 }
