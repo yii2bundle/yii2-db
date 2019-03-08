@@ -39,7 +39,7 @@ class ConnectionHelper
 				$error->add('username', Yii::t('app/connection', 'bad_username'));
 				$error->add('password', Yii::t('app/connection', 'bad_password'));
 			}
-			throw new UnprocessableEntityHttpException($error);
+			throw new UnprocessableEntityHttpException($error, 0, $e);
 		}
 	}
 	
