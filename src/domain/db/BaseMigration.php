@@ -13,6 +13,7 @@ abstract class BaseMigration extends Migration {
 	use MyMethodTrait;
 	
 	protected $table;
+    public $tableComment;
 	
 	/**
 	 * @inheritdoc

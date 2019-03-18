@@ -76,7 +76,10 @@ abstract class MigrationCreateTable extends BaseMigration {
 		if(method_exists($this, 'afterCreate')) {
 			$this->afterCreate();
 		}
-		
+		if(!isset($this->tableComment)) {
+            $this->tableComment = $this->table;
+        }
+        $this->addCommentOnTable($this->tableName(), $this->tableComment);
 		$this->trigger(EventEnum::AFTER_CREATE_TABLE, $event);
 	}
 	
