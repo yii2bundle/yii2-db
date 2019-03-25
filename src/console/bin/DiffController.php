@@ -69,10 +69,8 @@ class DiffController extends \yii\base\Component
 
         $tableNames = Select::display('Select tables', array_keys($maps));
 
-        $dbInstances = DiffHelper::getDbInstancesByConnectionNames($connectionNames);
-        /** @var TableEntity[][] $tableEntityCollection */
-        $tableEntityCollection = DiffHelper::getTableEntityCollectionFromDbInstances($dbInstances, $tableNames);
-        $allTables = DiffHelper::diff($tableEntityCollection, $tableNames, $connectionNames);
+        $allTables = DiffHelper::diff($tableNames, $connectionNames);
+
         d($allTables);
     }
 

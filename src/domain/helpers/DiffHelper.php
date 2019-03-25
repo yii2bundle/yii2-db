@@ -24,6 +24,27 @@ class DiffHelper {
 
     public static $skipColumnValues = [];
 
+    public static function getMaps($connectionNames) {
+        $map = [];
+        foreach ($connectionNames as $connectionName) {
+            $connectionMap = EnvService::getServer('db.' . $connectionName . '.map', []);
+            $map = ArrayHelper::merge($map, $connectionMap);
+        }
+        return $map;
+    }
+
+    public static function diff($tableNames, $connectionNames) {
+        $dbInstances = self::getDbInstancesByConnectionNames($connectionNames);
+        /** @var TableEntity[][] $tableEntityCollection */
+        $tableEntityCollection = self::getTableEntityCollectionFromDbInstances($dbInstances, $tableNames);
+
+        $connectionName1 = $connectionNames[0];
+        $connectionName2 = $connectionNames[1];
+        $diff[$connectionName1] = self::diff1($tableEntityCollection, $tableNames, $connectionName1, $connectionName2);
+        $diff[$connectionName2] = self::diff1($tableEntityCollection, $tableNames, $connectionName2, $connectionName1);
+        return $diff;
+    }
+
     private static function isSkip($k, $value1, $value2) {
         if(array_key_exists($k, self::$skipColumnValues) && empty(self::$skipColumnValues[$k])) {
             return true;
@@ -48,7 +69,7 @@ class DiffHelper {
         }
 
         if($tableEntity1->primary_key != $tableEntity2->primary_key) {
-            $tableErrors['foreign_keys'][$foreignEntity1->name]['primary_key'] = true;
+            $tableErrors['primary_key'][$foreignEntity1->name] = true;
         }
         //$tableErrors['primary_key'] = array_diff_assoc($tableEntity1->primary_key, $tableEntity2->primary_key);
 
@@ -81,14 +102,6 @@ class DiffHelper {
         return $tableErrors;
     }
 
-    public static function diff($tableEntityCollection, $tableNames, $connectionNames) {
-        $connectionName1 = $connectionNames[0];
-        $connectionName2 = $connectionNames[1];
-        $diff[$connectionName1] = self::diff1($tableEntityCollection, $tableNames, $connectionName1, $connectionName2);
-        $diff[$connectionName2] = self::diff1($tableEntityCollection, $tableNames, $connectionName2, $connectionName1);
-        return $diff;
-    }
-
     private static function diff1($tableEntityCollection, $tableNames, $connectionName1, $connectionName2) {
         $allTables = [];
         $tables = [];
@@ -107,25 +120,14 @@ class DiffHelper {
         return $allTables;
     }
 
-    public static function getDbInstancesByConnectionNames($connectionNames) {
+    private static function getDbInstancesByConnectionNames($connectionNames) {
         foreach ($connectionNames as $connectionName) {
-            $connectionConfig = EnvService::getServer('db.' . $connectionName, []);
-            $dbConfig = DbHelper::adapterConfig($connectionConfig);
-            $dbInstances[$connectionName] = new \yii\db\Connection($dbConfig);
+            $dbInstances[$connectionName] = DbHelper::getDbInstanceFromConnectionName($connectionName);
         }
         return $dbInstances;
     }
 
-    public static function getMaps($connectionNames) {
-        $map = [];
-        foreach ($connectionNames as $connectionName) {
-            $connectionMap = EnvService::getServer('db.' . $connectionName . '.map', []);
-            $map = ArrayHelper::merge($map, $connectionMap);
-        }
-        return $map;
-    }
-
-    public static function getTableEntityCollectionFromDbInstances($dbInstances,  $tableNames) {
+    private static function getTableEntityCollectionFromDbInstances($dbInstances,  $tableNames) {
         $collection = [];
         foreach ($dbInstances as $dbName => $dbInstance) {
             foreach ($tableNames as $globalTableName) {
@@ -135,16 +137,10 @@ class DiffHelper {
         return $collection;
     }
 
-    private static function getDbInstance($connectionName) {
-        $connectionConfig = EnvService::getServer('db.' . $connectionName, []);
-        $dbConfig = DbHelper::adapterConfig($connectionConfig);
-        return new \yii\db\Connection($dbConfig);
-    }
-
     private static function getTableSchema($connectionName, $globalTableName) {
         $connectionMap = EnvService::getServer('db.' . $connectionName . '.map', []);
         $tableName = TableHelper::getGlobalName($globalTableName, $connectionMap);
-        $dbInstance = self::getDbInstance($connectionName);
+        $dbInstance = DbHelper::getDbInstanceFromConnectionName($connectionName);
         $tableSchema = $dbInstance->getTableSchema($tableName);
         if(!empty($tableSchema)) {
             $tableEntity = new TableEntity;
