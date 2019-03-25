@@ -13,8 +13,8 @@ class DbHelper {
 		$connectionFromEnv = DbHelper::adapterConfig($connectionFromEnv);
 		return $connectionFromEnv;
 	}
-	
-	private static function adapterConfig($connection) {
+
+    public static function adapterConfig($connection) {
 		$connection = self::forgeMigrator($connection);
 		if($connection['driver'] == DbDriverEnum::PGSQL) {
 			$connection = PostgresHelper::postgresSchemaMap($connection);

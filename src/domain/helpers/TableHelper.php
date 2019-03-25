@@ -19,9 +19,13 @@ class TableHelper
 
     private static $map = null;
 
-	public static function getGlobalName(string $tableName) {
-		self::loadMap();
-        $globalName = ArrayHelper::getValue(self::$map, $tableName);
+	public static function getGlobalName(string $tableName, array $map = null) {
+		if(isset($map)) {
+            $globalName = ArrayHelper::getValue($map, $tableName);
+        } else {
+            self::loadMap();
+            $globalName = ArrayHelper::getValue(self::$map, $tableName);
+        }
         if($globalName) {
             $tableName = $globalName;
         }
