@@ -1,0 +1,163 @@
+<?php
+
+namespace yii2lab\db\domain\helpers;
+
+use yii2rails\app\domain\enums\AppEnum;
+use yii2rails\app\domain\helpers\EnvService;
+use yii2lab\db\domain\enums\DbDriverEnum;
+use Yii;
+use yii\console\ExitCode;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Console;
+use yii2bundle\db\domain\entities\TableEntity;
+use yii2lab\db\domain\helpers\DbHelper;
+use yii2lab\db\domain\helpers\TableHelper;
+use yii2rails\extension\console\helpers\input\Question;
+use yii2rails\extension\console\helpers\input\Select;
+use yii2rails\extension\console\helpers\Output;
+use yii2rails\domain\data\EntityCollection;
+use yii2module\vendor\domain\entities\TestEntity;
+use yii2rails\extension\console\helpers\input\Enter;
+use yii2lab\db\domain\helpers\MigrationHelper;
+
+class DiffHelper {
+
+    public static $skipColumnValues = [];
+
+    private static function isSkip($k, $value1, $value2) {
+        if(array_key_exists($k, self::$skipColumnValues) && empty(self::$skipColumnValues[$k])) {
+            return true;
+        }
+        if(empty(self::$skipColumnValues[$k])) {
+            return false;
+        }
+        $skipValues = self::$skipColumnValues[$k];
+        foreach ($skipValues as $values) {
+            if(in_array($value1, $values) && in_array($value2, $values)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function diffTable($tableEntity1, $tableEntity2, $globalName) {
+        $tableErrors = [];
+
+        if(empty($tableEntity1) || empty($tableEntity2)) {
+            return null;
+        }
+
+        if($tableEntity1->primary_key != $tableEntity2->primary_key) {
+            $tableErrors['foreign_keys'][$foreignEntity1->name]['primary_key'] = true;
+        }
+        //$tableErrors['primary_key'] = array_diff_assoc($tableEntity1->primary_key, $tableEntity2->primary_key);
+
+        foreach ($tableEntity1->foreign_keys as $foreignEntity1) {
+            $foreignEntity2 = $tableEntity2->foreign_keys[$foreignEntity1->self_field];
+            if($foreignEntity1->self_field != $foreignEntity2->self_field) {
+                $tableErrors['foreign_keys'][$foreignEntity1->name]['self_field'] = true;
+            }
+            if($foreignEntity1->rel_field != $foreignEntity2->rel_field) {
+                $tableErrors['foreign_keys'][$foreignEntity1->name]['rel_field'] = true;
+            }
+        }
+
+        foreach ($tableEntity1->columns as $columnEntity1) {
+            if(empty($tableEntity2->columns[$columnEntity1->name])) {
+                $tableErrors['columns'][$columnEntity1->name] = null;
+            } else {
+                $columnEntity2 = $tableEntity2->columns[$columnEntity1->name];
+                foreach ($columnEntity1->toArray() as $k => $v) {
+                    $v2 = $columnEntity2->{$k};
+                    if($v != $v2) {
+                        $isSkip = self::isSkip($k, $v, $v2);
+                        if(!$isSkip) {
+                            $tableErrors['columns'][$columnEntity1->name][$k] = [$v, $columnEntity2->{$k}];
+                        }
+                    }
+                }
+            }
+        }
+        return $tableErrors;
+    }
+
+    public static function diff($tableEntityCollection, $tableNames, $connectionNames) {
+        $connectionName1 = $connectionNames[0];
+        $connectionName2 = $connectionNames[1];
+        $diff[$connectionName1] = self::diff1($tableEntityCollection, $tableNames, $connectionName1, $connectionName2);
+        $diff[$connectionName2] = self::diff1($tableEntityCollection, $tableNames, $connectionName2, $connectionName1);
+        return $diff;
+    }
+
+    private static function diff1($tableEntityCollection, $tableNames, $connectionName1, $connectionName2) {
+        $allTables = [];
+        $tables = [];
+        foreach ($tableNames as $globalName) {
+            $tableEntity1 = $tableEntityCollection[$connectionName1][$globalName];
+            $tableEntity2 = $tableEntityCollection[$connectionName2][$globalName];
+            if(!empty($tableEntity1) && !empty($tableEntity2)) {
+                $diff = self::diffTable($tableEntity1, $tableEntity2, $globalName);
+                if($diff) {
+                    $allTables[$globalName] = $diff;
+                }
+            } elseif(empty($tableEntity2)) {
+                $allTables[$globalName] = null;
+            }
+        }
+        return $allTables;
+    }
+
+    public static function getDbInstancesByConnectionNames($connectionNames) {
+        foreach ($connectionNames as $connectionName) {
+            $connectionConfig = EnvService::getServer('db.' . $connectionName, []);
+            $dbConfig = DbHelper::adapterConfig($connectionConfig);
+            $dbInstances[$connectionName] = new \yii\db\Connection($dbConfig);
+        }
+        return $dbInstances;
+    }
+
+    public static function getMaps($connectionNames) {
+        $map = [];
+        foreach ($connectionNames as $connectionName) {
+            $connectionMap = EnvService::getServer('db.' . $connectionName . '.map', []);
+            $map = ArrayHelper::merge($map, $connectionMap);
+        }
+        return $map;
+    }
+
+    public static function getTableEntityCollectionFromDbInstances($dbInstances,  $tableNames) {
+        $collection = [];
+        foreach ($dbInstances as $dbName => $dbInstance) {
+            foreach ($tableNames as $globalTableName) {
+                $collection[$dbName][$globalTableName] = self::getTableSchema($dbName, $globalTableName);
+            }
+        }
+        return $collection;
+    }
+
+    private static function getDbInstance($connectionName) {
+        $connectionConfig = EnvService::getServer('db.' . $connectionName, []);
+        $dbConfig = DbHelper::adapterConfig($connectionConfig);
+        return new \yii\db\Connection($dbConfig);
+    }
+
+    private static function getTableSchema($connectionName, $globalTableName) {
+        $connectionMap = EnvService::getServer('db.' . $connectionName . '.map', []);
+        $tableName = TableHelper::getGlobalName($globalTableName, $connectionMap);
+        $dbInstance = self::getDbInstance($connectionName);
+        $tableSchema = $dbInstance->getTableSchema($tableName);
+        if(!empty($tableSchema)) {
+            $tableEntity = new TableEntity;
+            $tableEntity->name = $tableSchema->name;
+            $tableEntity->global_name = $tableSchema->name;
+            $tableEntity->connection = $connectionName;
+            $tableEntity->schema = $tableSchema->schemaName;
+            $tableEntity->primary_key = $tableSchema->primaryKey;
+            $tableEntity->foreign_keys = $tableSchema->foreignKeys;
+            $tableEntity->columns = $tableSchema->columns;
+            return $tableEntity;
+        } else {
+            return null;
+        }
+    }
+}
