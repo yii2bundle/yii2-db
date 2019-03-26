@@ -22,13 +22,17 @@ use yii2lab\db\domain\helpers\MigrationHelper;
 
 class DiffHelper {
 
+    const NOT_EXISTS_MESSAGE = '-not exists-';
+
     public static $skipColumnValues = [];
 
     public static function getMaps($connectionNames) {
         $map = [];
         foreach ($connectionNames as $connectionName) {
             $connectionMap = EnvService::getServer('db.' . $connectionName . '.map', []);
-            $map = ArrayHelper::merge($map, $connectionMap);
+            if($connectionMap) {
+                $map = ArrayHelper::merge($map, $connectionMap);
+            }
         }
         return $map;
     }
@@ -69,23 +73,37 @@ class DiffHelper {
         }
 
         if($tableEntity1->primary_key != $tableEntity2->primary_key) {
-            $tableErrors['primary_key'][$foreignEntity1->name] = true;
+            $tableErrors['primary_key'] = [
+                $tableEntity1->primary_key,
+                $tableEntity2->primary_key,
+            ];
         }
         //$tableErrors['primary_key'] = array_diff_assoc($tableEntity1->primary_key, $tableEntity2->primary_key);
 
         foreach ($tableEntity1->foreign_keys as $foreignEntity1) {
-            $foreignEntity2 = $tableEntity2->foreign_keys[$foreignEntity1->self_field];
-            if($foreignEntity1->self_field != $foreignEntity2->self_field) {
-                $tableErrors['foreign_keys'][$foreignEntity1->name]['self_field'] = true;
-            }
-            if($foreignEntity1->rel_field != $foreignEntity2->rel_field) {
-                $tableErrors['foreign_keys'][$foreignEntity1->name]['rel_field'] = true;
+            $name = $foreignEntity1->self_field;
+            if(!empty($tableEntity2->foreign_keys[$foreignEntity1->self_field])) {
+                $foreignEntity2 = $tableEntity2->foreign_keys[$foreignEntity1->self_field];
+                if($foreignEntity1->self_field != $foreignEntity2->self_field) {
+                    $tableErrors['foreign_keys'][$name]['self_field'] = [
+                        $foreignEntity1->self_field,
+                        $foreignEntity2->self_field,
+                    ];
+                }
+                if($foreignEntity1->rel_field != $foreignEntity2->rel_field) {
+                    $tableErrors['foreign_keys'][$name]['rel_field'] = [
+                        $foreignEntity1->rel_field,
+                        $foreignEntity2->rel_field,
+                    ];
+                }
+            } else {
+                $tableErrors['foreign_keys'][$name] = self::NOT_EXISTS_MESSAGE;
             }
         }
 
         foreach ($tableEntity1->columns as $columnEntity1) {
             if(empty($tableEntity2->columns[$columnEntity1->name])) {
-                $tableErrors['columns'][$columnEntity1->name] = null;
+                $tableErrors['columns'][$columnEntity1->name] = self::NOT_EXISTS_MESSAGE;
             } else {
                 $columnEntity2 = $tableEntity2->columns[$columnEntity1->name];
                 foreach ($columnEntity1->toArray() as $k => $v) {
@@ -114,7 +132,7 @@ class DiffHelper {
                     $allTables[$globalName] = $diff;
                 }
             } elseif(empty($tableEntity2)) {
-                $allTables[$globalName] = null;
+                $allTables[$globalName] = self::NOT_EXISTS_MESSAGE;
             }
         }
         return $allTables;
