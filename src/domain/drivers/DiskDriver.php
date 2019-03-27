@@ -56,7 +56,7 @@ class DiskDriver implements DriverInterface
 	
 	private function getFixtureDir()
 	{
-		$fixtureDir = Yii::$app->params['fixture']['dir'];
+		$fixtureDir = ArrayHelper::getValue(Yii::$app->params, 'fixture.dir', '@common/fixtures');
 		return Yii::getAlias($fixtureDir);
 	}
 	
