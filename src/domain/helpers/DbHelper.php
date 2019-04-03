@@ -48,7 +48,16 @@ class DbHelper {
 			$connection['dsn'] = $connection['driver'] . ':' . $connection['dbname'];
 		} else {
 			$connection['host'] = isset($connection['host']) ? $connection['host'] : 'localhost';
-			$connection['dsn'] = $connection['driver'] . ':host=' . $connection['host'] . ';dbname=' . $connection['dbname'];
+			
+			$dsn = $connection['driver'] . ':';
+			$dsnParams = [];
+			$dsnParams[] = 'host=' . $connection['host'];
+			if($connection['port']) {
+				$dsnParams[] = 'port=' . $connection['port'];
+			}
+			$dsnParams[] = 'dbname=' . $connection['dbname'];
+			
+			$connection['dsn'] = $connection['driver'] . ':' . implode(';', $dsnParams);
 		}
 		return $connection['dsn'];
 	}
@@ -56,6 +65,7 @@ class DbHelper {
 	private static function clean($connection) {
 		unset($connection['driver']);
 		unset($connection['host']);
+		unset($connection['port']);
 		unset($connection['dbname']);
         unset($connection['map']);
 		return $connection;
