@@ -2,19 +2,26 @@
 
 namespace yii2lab\db\domain\helpers;
 
+use yii\db\Connection;
 use yii2rails\app\domain\enums\AppEnum;
 use yii2rails\app\domain\helpers\EnvService;
 use yii2lab\db\domain\enums\DbDriverEnum;
 
 class DbHelper {
-	
+
+    public static function getDbInstanceFromConnectionName($connectionName) {
+        $connectionConfig = EnvService::getConnection($connectionName);
+        $dbConfig = DbHelper::adapterConfig($connectionConfig);
+        return new Connection($dbConfig);
+    }
+
 	public static function getConfigFromEnv($name) {
 		$connectionFromEnv = EnvService::getConnection($name);
 		$connectionFromEnv = DbHelper::adapterConfig($connectionFromEnv);
 		return $connectionFromEnv;
 	}
-	
-	private static function adapterConfig($connection) {
+
+    public static function adapterConfig($connection) {
 		$connection = self::forgeMigrator($connection);
 		if($connection['driver'] == DbDriverEnum::PGSQL) {
 			$connection = PostgresHelper::postgresSchemaMap($connection);
