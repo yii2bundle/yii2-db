@@ -59,7 +59,7 @@ class DbHelper {
 			$dsn = $connection['driver'] . ':';
 			$dsnParams = [];
 			$dsnParams[] = 'host=' . $connection['host'];
-			if($connection['port']) {
+			if(isset($connection['port'])) {
 				$dsnParams[] = 'port=' . $connection['port'];
 			}
 			$dsnParams[] = 'dbname=' . $connection['dbname'];
