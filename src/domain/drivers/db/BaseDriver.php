@@ -5,6 +5,8 @@ namespace yii2lab\db\domain\drivers\db;
 use Yii;
 use yii\db\Query;
 use yii\db\Transaction;
+use yii2lab\db\domain\enums\DbDriverEnum;
+use yii2lab\db\domain\helpers\ConnectionHelper;
 use yii2lab\db\domain\interfaces\DbDriverInterface;
 
 abstract class BaseDriver implements DbDriverInterface
@@ -64,12 +66,33 @@ abstract class BaseDriver implements DbDriverInterface
 	{
 		return $this->createSql()->insert($table, $row)->execute();
 	}
-	
+
+    protected function setAutoIncrement($table)
+    {
+        $schema = Yii::$app->db->schema->getTableSchema($table);
+        if(!empty($schema->primaryKey)) {
+            $pkName = $schema->primaryKey[0];
+            $sql = 'SELECT MAX('.$pkName.') FROM ' . $table;
+            $command = Yii::$app->db->createCommand($sql);
+            $max = $command->queryOne();
+            $maxId = $max['max'];
+            if($maxId > 1) {
+                $sql = 'SELECT setval(\''.$table.'_'.$pkName.'_seq\', '.$maxId.')';
+                $command = Yii::$app->db->createCommand($sql);
+                $command->execute();
+            }
+        }
+    }
+
 	protected function insertDataInTable($table, $data)
 	{
 		foreach($data as $row) {
 			$this->insertRowInTable($table, $row);
 		}
+        $driver = ConnectionHelper::getDriverFromDb(Yii::$app->db);
+        if($driver == DbDriverEnum::PGSQL) {
+            $this->setAutoIncrement($table);
+        }
 	}
 	
 	protected function isExistsTable($table)
