@@ -4,6 +4,7 @@ namespace yii2lab\db\domain\helpers;
 
 use Yii;
 use yii\base\Component;
+use yii2lab\db\domain\enums\DbDriverEnum;
 use yii2lab\db\domain\interfaces\DriverInterface;
 use yii2mod\helpers\ArrayHelper;
 
@@ -32,11 +33,22 @@ class Fixtures extends Component
 	
 	public function tableNameList()
 	{
-		$schemas = Yii::$app->db->schema->getTableSchemas();
-		$list = ArrayHelper::getColumn($schemas, 'name');
-		sort($list);
-		reset($list);
-		return $list;
+        $driver = ConnectionHelper::getDriverFromDb(Yii::$app->db);
+        if($driver == DbDriverEnum::PGSQL) {
+            $schemaNames = Yii::$app->db->schema->getSchemaNames();
+        } else {
+            $schemaNames = [''];
+        }
+        $tables = [];
+        foreach ($schemaNames as $schemaName) {
+            $tableColumns = Yii::$app->db->schema->getTableSchemas($schemaName);
+            $tableNames = ArrayHelper::getColumn($tableColumns, 'name');
+            foreach ($tableNames as $tableName) {
+                $table = $schemaName . DOT . $tableName;
+                $tables[] = trim($table, DOT);
+            }
+        }
+        return $tables;
 	}
 	
 	public function fixtureNameList()
