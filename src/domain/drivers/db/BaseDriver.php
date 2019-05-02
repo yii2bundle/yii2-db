@@ -86,9 +86,12 @@ abstract class BaseDriver implements DbDriverInterface
 
 	protected function insertDataInTable($table, $data)
 	{
-		foreach($data as $row) {
-			$this->insertRowInTable($table, $row);
-		}
+	    if(empty($data)) {
+	        return;
+        }
+        $data = array_values($data);
+        $columns = array_keys($data[0]);
+        $this->createSql()->batchInsert($table, $columns, $data)->execute();
         $driver = ConnectionHelper::getDriverFromDb(Yii::$app->db);
         if($driver == DbDriverEnum::PGSQL) {
             $this->setAutoIncrement($table);
