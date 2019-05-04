@@ -4,6 +4,7 @@ namespace yii2lab\db\domain\helpers;
 
 use Yii;
 use yii\base\Component;
+use yii2bundle\db\console\bin\OutputHandler;
 use yii2lab\db\domain\enums\DbDriverEnum;
 use yii2lab\db\domain\interfaces\DriverInterface;
 use yii2mod\helpers\ArrayHelper;
@@ -14,6 +15,10 @@ class Fixtures extends Component
 	const DRIVER_NAMESPACE = 'yii2lab\db\domain\drivers';
 	private $dbDriver;
 	private $diskDriver;
+    /**
+     * @var OutputHandler
+     */
+	public $outputHandler;
 	
 	public function init()
 	{
@@ -67,18 +72,23 @@ class Fixtures extends Component
 		}
 		
 		foreach($all as $table) {
+		    $this->outputHandler->line('disable foreign key checks for "' . $table . '" table');
 			$toDriver->disableForeignKeyChecks($table);
 		}
 		
 		foreach($all as $table) {
+            $this->outputHandler->line('truncate data for "' . $table . '" table');
 			$toDriver->truncateData($table);
 		}
 		
 		$toDriver->beginTransaction();
 		foreach($all as $table) {
+            $this->outputHandler->line('copy data for "' . $table . '" table');
 			$copyResult = $this->copyData($table, $fromDriver, $toDriver);
 			$result[] = $table . ' ' . ($copyResult ? '' : '[fail]') . '';
 		}
+
+        $this->outputHandler->line('commit transaction for all');
 		$toDriver->commitTransaction();
 		return $result;
 	}

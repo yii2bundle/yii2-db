@@ -14,6 +14,14 @@ use yii2lab\db\domain\helpers\Fixtures;
 use yii2rails\extension\console\helpers\input\Select;
 use yii2rails\extension\console\helpers\input\Enter;
 
+class OutputHandler {
+
+    public function line($text) {
+        Output::line($text);
+    }
+
+}
+
 class FixtureController extends \yii\base\Component
 {
 	
@@ -29,6 +37,7 @@ class FixtureController extends \yii\base\Component
     {
         /** @var Fixtures $fixtures */
         $fixtures = Yii::createObject(Fixtures::class);
+        $fixtures->outputHandler = new OutputHandler;
         $option = Question::displayWithQuit('Select operation', ['Export', 'Import'], $option);
         if($option == 'e') {
             $allTables = $fixtures->tableNameList();
@@ -57,6 +66,7 @@ class FixtureController extends \yii\base\Component
     public function actionOne($option = null)
     {
         $fixtures = Yii::createObject(Fixtures::class);
+        $fixtures->outputHandler = new OutputHandler;
         $option = Question::displayWithQuit('Select operation', ['Export', 'Import'], $option);
         if($option == 'e') {
             $table = Enter::display('Enter table name for export');
