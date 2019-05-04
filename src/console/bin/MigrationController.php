@@ -5,7 +5,9 @@ namespace yii2bundle\db\console\bin;
 use Yii;
 use yii\console\ExitCode;
 use yii\helpers\Console;
+use yii2lab\db\domain\helpers\Fixtures;
 use yii2rails\extension\console\helpers\input\Question;
+use yii2rails\extension\console\helpers\input\Select;
 use yii2rails\extension\console\helpers\Output;
 use yii2rails\extension\console\base\Controller;
 use yii2rails\domain\data\EntityCollection;
@@ -26,9 +28,19 @@ class MigrationController extends \yii\base\Component
      */
     public function actionGenerate()
     {
-        $tableName = Enter::display('Enter table name');
-        $className = MigrationHelper::generateByTableName($tableName);
-        Output::block($className, 'Migration created!');
+        /** @var Fixtures $fixtures */
+        $fixtures = Yii::createObject(Fixtures::class);
+        $allTables = $fixtures->tableNameList();
+        if(!empty($allTables)) {
+            $answer = Select::display('Select tables', $allTables, 1);
+            foreach ($answer as $table) {
+                Output::line('Generate migration for "' . $table . '"');
+                $className = MigrationHelper::generateByTableName($table);
+            }
+            Output::line('Migrations generated!');
+        } else {
+            Output::block("not tables!");
+        }
     }
 
 }

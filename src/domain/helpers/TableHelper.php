@@ -19,6 +19,21 @@ class TableHelper
 
     private static $map = null;
 
+    public static function getLocalName(string $tableName, array $map = null) {
+        if(isset($map)) {
+            $map = array_flip($map);
+            $globalName = ArrayHelper::getValue($map, $tableName);
+        } else {
+            self::loadMap();
+            $map = array_flip(self::$map);
+            $globalName = ArrayHelper::getValue($map, $tableName);
+        }
+        if($globalName) {
+            $tableName = $globalName;
+        }
+        return $tableName;
+    }
+
 	public static function getGlobalName(string $tableName, array $map = null) {
 		if(isset($map)) {
             $globalName = ArrayHelper::getValue($map, $tableName);

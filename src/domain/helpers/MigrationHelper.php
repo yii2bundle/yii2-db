@@ -32,6 +32,7 @@ class MigrationHelper {
 	
 	public static function generateByTableName($tableName, $namespace = 'console\migrations') {
 		$tableSchema = Yii::$app->db->getTableSchema($tableName);
+		$tableName = TableHelper::getLocalName($tableName);
 		$className = self::getClassName($tableName, $namespace);
 		$config = [
 			'className' => $className,
@@ -87,9 +88,11 @@ class MigrationHelper {
 		foreach($tableSchema->foreignKeys as $foreign) {
 			foreach($foreign as $kk => $rr) {
 				if(!is_integer($kk)) {
+                    $foreignTable = $foreign[0];
+                    $foreignTable = TableHelper::getLocalName($foreignTable);
 					$keysArr[] = "\$this->myAddForeignKey(
 			'{$kk}',
-			'{{%{$foreign[0]}}}',
+			'{$foreignTable}',
 			'{$rr}',
 			'CASCADE',
 			'CASCADE'
@@ -106,7 +109,7 @@ class MigrationHelper {
 		$columnStr = self::generateColumnsCode($tableSchema->columns);
 		$keysStr = self::generateKeysCode($tableSchema);
 		$code = <<<CODE
-	public \$table = '{{%{$tableName}}}';
+	public \$table = '{$tableName}';
 
 	/**
 	 * @inheritdoc
