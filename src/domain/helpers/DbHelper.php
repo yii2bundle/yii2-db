@@ -3,11 +3,32 @@
 namespace yii2lab\db\domain\helpers;
 
 use yii\db\Connection;
+use yii\helpers\ArrayHelper;
 use yii2rails\app\domain\enums\AppEnum;
 use yii2rails\app\domain\helpers\EnvService;
 use yii2lab\db\domain\enums\DbDriverEnum;
 
 class DbHelper {
+
+    public static function tableNameList()
+    {
+        $driver = ConnectionHelper::getDriverFromDb(\Yii::$app->db);
+        if($driver == DbDriverEnum::PGSQL) {
+            $schemaNames = \Yii::$app->db->schema->getSchemaNames();
+        } else {
+            $schemaNames = [''];
+        }
+        $tables = [];
+        foreach ($schemaNames as $schemaName) {
+            $tableColumns = \Yii::$app->db->schema->getTableSchemas($schemaName);
+            $tableNames = ArrayHelper::getColumn($tableColumns, 'name');
+            foreach ($tableNames as $tableName) {
+                $table = $schemaName . DOT . $tableName;
+                $tables[] = trim($table, DOT);
+            }
+        }
+        return $tables;
+    }
 
     public static function getDbInstanceFromConnectionName($connectionName) {
         $connectionConfig = EnvService::getConnection($connectionName);

@@ -3,6 +3,7 @@
 namespace yii2lab\db\console\controllers;
 
 use Yii;
+use yii2lab\db\domain\helpers\DbHelper;
 use yii2rails\extension\console\base\Controller;
 use yii2lab\db\domain\helpers\Fixtures;
 use yii2rails\extension\console\helpers\Output;
@@ -22,7 +23,7 @@ class FixtureController extends Controller
 		$fixtures = Yii::createObject(Fixtures::class);
 		$option = Question::displayWithQuit('Select operation', ['Export', 'Import'], $option);
 		if($option == 'e') {
-			$allTables = $fixtures->tableNameList();
+            $allTables = DbHelper::tableNameList();
 			if(!empty($allTables)) {
 				$answer = Select::display('Select tables for export', $allTables, 1);
 				$tables = $fixtures->export($answer);

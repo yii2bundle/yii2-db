@@ -5,6 +5,7 @@ namespace yii2bundle\db\console\bin;
 use Yii;
 use yii\console\ExitCode;
 use yii\helpers\Console;
+use yii2lab\db\domain\helpers\DbHelper;
 use yii2lab\db\domain\helpers\Fixtures;
 use yii2rails\extension\console\helpers\input\Question;
 use yii2rails\extension\console\helpers\input\Select;
@@ -30,7 +31,7 @@ class MigrationController extends \yii\base\Component
     {
         /** @var Fixtures $fixtures */
         $fixtures = Yii::createObject(Fixtures::class);
-        $allTables = $fixtures->tableNameList();
+        $allTables = DbHelper::tableNameList();
         if(!empty($allTables)) {
             $answer = Select::display('Select tables', $allTables, 1);
             foreach ($answer as $table) {

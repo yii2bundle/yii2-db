@@ -36,26 +36,6 @@ class Fixtures extends Component
 		return $this->copyAll($all, $this->diskDriver, $this->dbDriver);
 	}
 	
-	public function tableNameList()
-	{
-        $driver = ConnectionHelper::getDriverFromDb(Yii::$app->db);
-        if($driver == DbDriverEnum::PGSQL) {
-            $schemaNames = Yii::$app->db->schema->getSchemaNames();
-        } else {
-            $schemaNames = [''];
-        }
-        $tables = [];
-        foreach ($schemaNames as $schemaName) {
-            $tableColumns = Yii::$app->db->schema->getTableSchemas($schemaName);
-            $tableNames = ArrayHelper::getColumn($tableColumns, 'name');
-            foreach ($tableNames as $tableName) {
-                $table = $schemaName . DOT . $tableName;
-                $tables[] = trim($table, DOT);
-            }
-        }
-        return $tables;
-	}
-	
 	public function fixtureNameList()
 	{
 		$list = $this->diskDriver->getNameList();
