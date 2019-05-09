@@ -36,7 +36,7 @@ class SchemaController extends \yii\base\Component
         $schemas = array_unique($schemas);
         $schemas = array_values($schemas);
         foreach ($schemas as $schema) {
-            $sql = 'CREATE SCHEMA IF NOT EXISTS ' . $schema . '';
+            $sql = 'CREATE SCHEMA IF NOT EXISTS "' . $schema . '"';
             \Yii::$app->db->createCommand($sql)->execute();
         }
         Output::title('All schemas created');

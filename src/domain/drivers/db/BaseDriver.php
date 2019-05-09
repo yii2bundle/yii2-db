@@ -69,10 +69,14 @@ abstract class BaseDriver implements DbDriverInterface
 
     protected function setAutoIncrement($table)
     {
-        $schema = Yii::$app->db->schema->getTableSchema($table);
+	
+	
+	    
+	    $schema = Yii::$app->db->schema->getTableSchema($table);
         if(!empty($schema->primaryKey)) {
             $pkName = $schema->primaryKey[0];
-            $sql = 'SELECT MAX('.$pkName.') FROM ' . $table;
+	        $tableName = \Yii::$app->db->quoteTableName($table);
+            $sql = 'SELECT MAX('.$pkName.') FROM ' . $tableName;
             $command = Yii::$app->db->createCommand($sql);
             $max = $command->queryOne();
             $maxId = $max['max'];

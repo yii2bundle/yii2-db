@@ -2,17 +2,20 @@
 
 namespace yii2lab\db\domain\drivers\db;
 
+use yii2lab\db\domain\helpers\TableHelper;
 use yii2rails\extension\common\helpers\Helper;
 
 class PgsqlDriver extends BaseDriver
 {
 	
 	public function clearTable($table) {
+		$table = \Yii::$app->db->quoteTableName($table);
 		$this->executeSql("TRUNCATE TABLE $table RESTART IDENTITY CASCADE");
 	}
 	
 	public function disableForeignKeyChecks($table)
 	{
+		$table = \Yii::$app->db->quoteTableName($table);
 		$this->executeSql("ALTER TABLE $table DISABLE TRIGGER ALL;");
 	}
 	
