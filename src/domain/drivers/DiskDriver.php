@@ -3,6 +3,7 @@
 namespace yii2lab\db\domain\drivers;
 
 use Yii;
+use yii2lab\db\domain\helpers\TableHelper;
 use yii2rails\extension\store\StoreFile;
 use yii2rails\extension\yii\helpers\FileHelper;
 use yii\helpers\Inflector;
@@ -16,18 +17,21 @@ class DiskDriver implements DriverInterface
 	
 	public function truncateData($table)
 	{
+        $table = TableHelper::getLocalName($table);
 		$file = $this->getFixtureDataDir() . DS . $table . '.php';
 		return FileHelper::remove($file);
 	}
 	
 	public function loadData($table)
 	{
+        $table = TableHelper::getLocalName($table);
 		$file = $this->getFixtureDataDir() . DS . $table . '.php';
 		return include($file);
 	}
 	
 	public function saveData($table, $data)
 	{
+        $table = TableHelper::getLocalName($table);
 		//$table = $this->getPureTableName($table);
 		$this->saveDataFile($table, $data);
 		$this->saveFixtureFile($table);
@@ -68,6 +72,7 @@ class DiskDriver implements DriverInterface
 	private function saveDataFile($table, $rows)
 	{
 		$rows = $this->indexingDataByPk($table, $rows);
+        $table = TableHelper::getLocalName($table);
 		$file = $this->getFixtureDataDir() . DS . $table . '.php';
 		$store = new StoreFile($file);
 		$store->save($rows);
@@ -120,6 +125,7 @@ class DiskDriver implements DriverInterface
 	
 	private function saveFixtureFile($table)
 	{
+	    return;
 		$className = $this->fixtureClassName($table);
 		$file = $this->getFixtureDir() . DS . $className . '.php';
 		if(file_exists($file)) {
