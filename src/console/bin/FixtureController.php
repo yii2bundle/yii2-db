@@ -6,6 +6,7 @@ use Yii;
 use yii\console\ExitCode;
 use yii\helpers\Console;
 use yii2lab\db\domain\helpers\DbHelper;
+use yii2rails\extension\console\handlers\RenderHahdler;
 use yii2rails\extension\console\helpers\input\Question;
 use yii2rails\extension\console\helpers\Output;
 use yii2rails\extension\console\base\Controller;
@@ -14,14 +15,6 @@ use yii2module\vendor\domain\entities\TestEntity;
 use yii2lab\db\domain\helpers\Fixtures;
 use yii2rails\extension\console\helpers\input\Select;
 use yii2rails\extension\console\helpers\input\Enter;
-
-class OutputHandler {
-
-    public function line($text) {
-        Output::line($text);
-    }
-
-}
 
 class FixtureController extends \yii\base\Component
 {
@@ -38,7 +31,7 @@ class FixtureController extends \yii\base\Component
     {
         /** @var Fixtures $fixtures */
         $fixtures = Yii::createObject(Fixtures::class);
-        $fixtures->outputHandler = new OutputHandler;
+        $fixtures->outputHandler = new RenderHahdler;
         $option = Question::displayWithQuit('Select operation', ['Export', 'Import'], $option);
         if($option == 'e') {
             $allTables = DbHelper::tableNameList();
