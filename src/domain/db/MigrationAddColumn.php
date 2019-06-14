@@ -17,7 +17,7 @@ abstract class MigrationAddColumn extends BaseMigration
 	{
 		$columns = $this->getColumns();
 		foreach($columns as $columnName => $columnConfig) {
-			$this->addColumn($this->table, $columnName, $columnConfig);
+			$this->addColumn($this->tableName(), $columnName, $columnConfig);
 		}
 	}
 	
@@ -28,7 +28,7 @@ abstract class MigrationAddColumn extends BaseMigration
 	{
 		$columns = $this->getColumns();
 		foreach($columns as $columnName => $columnConfig) {
-			$this->dropColumn($this->table, $columnName);
+			$this->dropColumn($this->tableName(), $columnName);
 		}
 	}
 	
