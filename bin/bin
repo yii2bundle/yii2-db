@@ -9,7 +9,7 @@ use yii2rails\domain\helpers\DomainHelper;
 use yii2rails\extension\console\helpers\BinConsoleHelper;
 
 DomainHelper::defineDomains([
-    //'vendor' => 'yii2module\vendor\domain\Domain',
+    //'vendor' => 'yii2tool\vendor\domain\Domain',
 	//'package' => 'yii2rails\extension\package\domain\Domain',
 ]);
 
