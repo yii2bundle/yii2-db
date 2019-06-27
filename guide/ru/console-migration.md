@@ -4,7 +4,8 @@
 Генерировать миграцию:
 
 ```
-php yii db/migration/generate
+cd vendor/yii2bundle/yii2-db/bin
+php bin migration/generate
 ```
 
 структура и связи будут взяты из текущей БД.
@@ -12,5 +13,6 @@ php yii db/migration/generate
 Инициализировать фильтры для БД:
 
 ```
-php yii db/init
+cd vendor/yii2bundle/yii2-db/bin
+php bin init
 ```

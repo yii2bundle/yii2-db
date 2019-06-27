@@ -9,11 +9,13 @@
 Для экпорта/импорта таблиц по выбору:
 
 ```
-php yii fixtures
+cd vendor/yii2bundle/yii2-db/bin
+php bin fixture
 ```
 
 Для экпорта/импорта таблицы по ее имени:
 
 ```
-php yii fixtures/default/one
+cd vendor/yii2bundle/yii2-db/bin
+php bin fixture/one
 ```
