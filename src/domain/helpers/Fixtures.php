@@ -43,7 +43,25 @@ class Fixtures extends Component
 		reset($list);
 		return $list;
 	}
-	
+
+    private function primaryKey($all) {
+	    foreach ($all as $item) {
+	        if(!empty($item['id'])) {
+	            return 'id';
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private function sortData(&$all) {
+        $pk = $this->primaryKey($all);
+        if($pk) {
+            ArrayHelper::multisort($all, $pk);
+            $all = array_values($all);
+        }
+    }
+
 	private function copyAll($all, DriverInterface $fromDriver, DriverInterface $toDriver)
 	{
 		$result = [];
@@ -80,7 +98,7 @@ class Fixtures extends Component
 		if(empty($data)) {
 			return false;
 		}
-		
+        $this->sortData($data);
 		/** @var DriverInterface $toDriver */
 		return $toDriver->saveData($table, $data);
 	}
