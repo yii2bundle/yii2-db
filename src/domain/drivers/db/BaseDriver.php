@@ -69,9 +69,6 @@ abstract class BaseDriver implements DbDriverInterface
 
     protected function setAutoIncrement($table)
     {
-	
-	
-	    
 	    $schema = Yii::$app->db->schema->getTableSchema($table);
         if(!empty($schema->primaryKey)) {
             $pkName = $schema->primaryKey[0];
@@ -80,7 +77,7 @@ abstract class BaseDriver implements DbDriverInterface
             $command = Yii::$app->db->createCommand($sql);
             $max = $command->queryOne();
             $maxId = $max['max'];
-            if($maxId > 1) {
+            if($maxId > 0) {
                 $sql = 'SELECT setval(\''.$table.'_'.$pkName.'_seq\', '.$maxId.')';
                 $command = Yii::$app->db->createCommand($sql);
                 $command->execute();
