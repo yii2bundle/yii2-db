@@ -29,5 +29,10 @@ abstract class BaseMigration extends Migration {
 		}
 		$this->table = MigrationHelper::getTableNameOfClass(get_class($this));
 	}
-	
+
+	public function array()
+    {
+        return parent::json();
+    }
+
 }
