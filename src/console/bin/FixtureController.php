@@ -7,6 +7,7 @@ use yii\console\ExitCode;
 use yii\helpers\Console;
 use yii2lab\db\domain\helpers\DbHelper;
 use yii2rails\extension\console\handlers\RenderHahdler;
+use yii2rails\extension\console\helpers\ArgHelper;
 use yii2rails\extension\console\helpers\input\Question;
 use yii2rails\extension\console\helpers\Output;
 use yii2rails\extension\console\base\Controller;
@@ -27,16 +28,28 @@ class FixtureController extends \yii\base\Component
     /**
      * Export or import fixtures
      */
-    public function actionIndex($option = null)
+    public function actionIndex($option = null, $answer = null)
     {
+        $args = ArgHelper::all();
+        if(array_key_exists('-i', $args)) {
+            $option = 'i';
+        }
+        if(array_key_exists('-e', $args)) {
+            $option = 'e';
+        }
+        if(array_key_exists('-a', $args)) {
+            $answer = 'a';
+        }
         /** @var Fixtures $fixtures */
         $fixtures = Yii::createObject(Fixtures::class);
         $fixtures->outputHandler = new RenderHahdler;
-        $option = Question::displayWithQuit('Select operation', ['Export', 'Import'], $option);
+        if(empty($option)) {
+            $option = Question::displayWithQuit('Select operation', ['Export', 'Import'], $option);
+        }
         if($option == 'e') {
             $allTables = DbHelper::tableNameList();
             if(!empty($allTables)) {
-                $answer = Select::display('Select tables for export', $allTables, 1);
+                $answer = Select::display('Select tables for export', $allTables, 1, 0, $answer);
                 $tables = $fixtures->export($answer);
                 Output::items($tables, 'Exported tables');
             } else {
@@ -45,7 +58,7 @@ class FixtureController extends \yii\base\Component
         } elseif($option == 'i') {
             $allTables = $fixtures->fixtureNameList();
             if(!empty($allTables)) {
-                $answer = Select::display('Select tables for import', $allTables, 1);
+                $answer = Select::display('Select tables for import', $allTables, 1, 0, $answer);
                 $tables = $fixtures->import($answer);
                 Output::items($tables, 'Imported tables');
             } else {
