@@ -3,6 +3,7 @@
 namespace yii2lab\db\domain\helpers;
 
 use yii\db\Connection;
+use yii2rails\app\domain\helpers\EnvService;
 
 class ConnectionFactoryHelper
 {
@@ -22,7 +23,7 @@ class ConnectionFactoryHelper
      */
     public static function getConnectionByName(string $name) : Connection {
         if(!isset(self::$connections[$name])) {
-            $connectionFromEnv = DbHelper::getConfigFromEnv($name);
+            $connectionFromEnv = EnvService::getConnection($name);
             self::$connections[$name] = self::createConnectionFromConfig($connectionFromEnv);
         }
         return self::$connections[$name];
