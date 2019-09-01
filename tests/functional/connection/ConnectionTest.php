@@ -3,6 +3,7 @@
 namespace tests\functional\connetcion;
 
 use yii2lab\db\domain\helpers\ConnectionFactoryHelper;
+use yii2lab\db\domain\helpers\ConnectionService;
 use yii2rails\extension\cache\InvalidArgumentException;
 use yii2rails\extension\cache\Cache;
 use yii2rails\extension\cache\CacheItem;
@@ -23,6 +24,33 @@ class ConnectionTest extends Unit {
         $connection = ConnectionFactoryHelper::createConnectionFromConfig($configDb);
         $query = 'SELECT * FROM "migration" LIMIT 50';
         $results =  $connection->createCommand($query)->queryAll();
+        $this->tester->assertCount(43, $results);
+    }
+
+    public function testRead2() {
+        $definitions = [
+            'db' => [
+                'class' => ConnectionService::class,
+                'connections' => [
+                    'main' => [
+                        'driver' => 'sqlite',
+                        'dbname' => __DIR__ . '\..\..\_data\sqlite\main.db',
+                    ],
+                    'slave' => [
+                        'driver' => 'sqlite',
+                        'dbname' => __DIR__ . '\..\..\_data\sqlite\main.db',
+                    ],
+                ],
+            ],
+        ];
+
+        $container = new Container($definitions);
+        $mainConnection = $container->db->getConnection('main');
+        $slaveConnection = $container->db->getConnection('slave');
+
+        $query = 'SELECT * FROM "migration" LIMIT 50';
+
+        $results =  $slaveConnection->createCommand($query)->queryAll();
         $this->tester->assertCount(43, $results);
     }
 
