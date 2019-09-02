@@ -3,13 +3,13 @@
 namespace tests\functional\connetcion;
 
 use yii2lab\db\domain\helpers\ConnectionFactoryHelper;
-use yii2lab\db\domain\helpers\ConnectionService;
-use yii2rails\extension\cache\InvalidArgumentException;
-use yii2rails\extension\cache\Cache;
-use yii2rails\extension\cache\CacheItem;
-use yii2rails\extension\container\Container;
+use yii2lab\db\domain\helpers\ConnectionContainer;
+use yii2rails\extension\psr\cache\InvalidArgumentException;
+use yii2rails\extension\psr\cache\Cache;
+use yii2rails\extension\psr\cache\CacheItem;
+use yii2rails\extension\psr\container\Container;
 use yii2rails\extension\encrypt\exceptions\SignatureInvalidException;
-use yii2rails\extension\encrypt\helpers\JwtService;
+use yii2rails\extension\encrypt\libs\JwtService;
 use yii2tool\test\Test\Unit;
 
 class ConnectionTest extends Unit {
@@ -30,7 +30,7 @@ class ConnectionTest extends Unit {
     public function testRead2() {
         $definitions = [
             'db' => [
-                'class' => ConnectionService::class,
+                'class' => ConnectionContainer::class,
                 'connections' => [
                     'main' => [
                         'driver' => 'sqlite',
@@ -45,8 +45,8 @@ class ConnectionTest extends Unit {
         ];
 
         $container = new Container($definitions);
-        $mainConnection = $container->db->getConnection('main');
-        $slaveConnection = $container->db->getConnection('slave');
+        $mainConnection = $container->db->get('main');
+        $slaveConnection = $container->db->get('slave');
 
         $query = 'SELECT * FROM "migration" LIMIT 50';
 
