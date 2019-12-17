@@ -38,7 +38,7 @@ class ConnectionFactoryHelper
         'driver' => 'pgsql',
         'username' => 'postgres',
         'password' => 'postgres',
-        'dbname' => 'dev_yutpl',
+        'dbname' => 'app_tpl',
         'defaultSchema' => 'common',
     ];
     $connection = ConnectionFactoryHelper::createConnectionFromConfig($configDb);
