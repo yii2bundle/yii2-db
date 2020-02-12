@@ -15,6 +15,9 @@ class Connection extends \yii\db\Connection
 		$name = YII_ENV_TEST ? 'test' : 'main';
 		$connectionFromEnv = DbHelper::getConfigFromEnv($name);
 		$config = ArrayHelper::merge($connectionFromEnv, $config);
+        if(isset($config['defaultSchema'])) {
+            unset($config['defaultSchema']);
+        }
 		parent::__construct($config);
 	}
 	
