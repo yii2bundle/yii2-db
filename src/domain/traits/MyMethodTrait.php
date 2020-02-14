@@ -32,7 +32,16 @@ trait MyMethodTrait {
         }
 
 	}
-	
+
+    protected function myDropForeignKey($columns, $refTable, $refColumns, $delete = 'CASCADE', $update = 'CASCADE') {
+        $refTable = self::getTableName($refTable);
+        if(Yii::$app->db->driverName == 'sqlite') {
+            return null;
+        }
+        $name = $this->generateNameForKey('fk', MigrationHelper::pureTableName($this->tableName()), [$columns, $refTable, $refColumns]);
+        return $this->dropForeignKey($name, $this->tableName());
+    }
+
 	protected function myAddForeignKey($columns, $refTable, $refColumns, $delete = 'CASCADE', $update = 'CASCADE') {
         $refTable = self::getTableName($refTable);
         if(Yii::$app->db->driverName == 'sqlite') {
